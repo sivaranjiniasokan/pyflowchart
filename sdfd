@@ -1,0 +1,173 @@
+ #Student To Browse Courses Offered by Sivaranjini A/P Asokan (1221103078) and Quah Sze Ting (1211111274)
+    ##Browse Course tab
+    #create frame
+    browsecourse_frame = ttk.Frame(notebook)
+    browsecourse_frame.grid(row=0)
+
+    #add frame into notebook
+    notebook.add(browsecourse_frame, text='Browse Course')
+
+    #add labels
+    fcourses_label = Label(browsecourse_frame, text='Courses offered for Foundation In Information Technology: ', background='#d8d9d8', font=("Arial",12))
+    fcourses_label.grid(row=0, column=0, padx=10, pady=5, sticky='w')
+
+    #show subjects
+    # create treeview frame
+    tree_frame = Frame(browsecourse_frame)
+    tree_frame.grid(row=1, column=0)
+      
+    global tree
+    # make treeview
+    tree = ttk.Treeview(tree_frame)
+
+    # create treeview scrollbar
+    tree_scroll = Scrollbar(tree_frame, orient ="vertical", command = tree.yview)
+    tree_scroll.grid(row=1, column=4, sticky='ns')
+
+    # scrollbar configure
+    tree_scroll.configure(command=tree.yview)
+
+    # treeview configure
+    tree.configure(yscrollcommand=tree_scroll.set)
+
+    # print treeview
+    tree.grid(row=1, column=0, columnspan=4, padx=5, pady=0, sticky="w")
+
+    # define columns
+    tree['columns'] = ('no', 'name', 'code', 'credithour')
+
+    # formate columns
+    tree.column('no', anchor=CENTER, width=50, minwidth=50, stretch=0)
+    tree.column('name', anchor=W, width=300, minwidth=300, stretch=0)
+    tree.column('code', anchor=CENTER, width=100, minwidth=100, stretch=0)
+    tree.column('credithour', anchor=CENTER, width=150, minwidth=150, stretch=0)
+
+    # define headings
+    tree.heading('no', text='No.', anchor=CENTER)
+    tree.heading('name', text='Subject Name', anchor=CENTER)
+    tree.heading('code', text='Subject Code', anchor=CENTER)
+    tree.heading('credithour', text='Subject Credit Hour', anchor=CENTER)
+
+    # get data
+    conn = sqlite3.connect('subject.db')
+    c = conn.cursor()
+    c.execute("SELECT *,oid FROM subject")
+    datas = c.fetchall()
+    a = 0
+    for data in datas:
+        tree.insert('', index='end', values=[data[27], data[0], data[1], data[2]], iid=a)
+        a+=1
+    conn.commit()
+    conn.close()
+
+    # add labels and entrys
+    global selected_no
+    global selected_name
+    global selected_code
+    selected_label = Label(browsecourse_frame, text="Selected : ", background='#d8d9d8', font=('Arial',12))
+    selected_label.grid(row=2, column=0, padx=5, pady=5, sticky='w')
+    selected_no_label = Label(browsecourse_frame, text="No. ", background='#d8d9d8', font=('Arial', 10))
+    selected_no_label.grid(row=2, column=0, padx=100, pady=5, sticky='w')
+    selected_no = Entry(browsecourse_frame, width=10)
+    selected_no.grid(row=2, column=0, padx=125, pady=5, sticky='w')
+    selected_name_label = Label(browsecourse_frame, text="Name ", background='#d8d9d8', font=('Arial', 10))
+    selected_name_label.grid(row=2, column=0, padx=200, pady=5, sticky='w')
+    selected_name = Entry(browsecourse_frame, width=30)
+    selected_name.grid(row=2, column=0, padx=240, pady=5, sticky='w')
+    selected_code_label = Label(browsecourse_frame, text="Code ", background='#d8d9d8', font=('Arial', 10))
+    selected_code_label.grid(row=2, column=0, padx=350, pady=5, sticky='e')
+    selected_code = Entry(browsecourse_frame, width=20)
+    selected_code.grid(row=2, column=0, padx=230, pady=5, sticky='e')
+
+    # selected_subject
+    def selected(event):
+        for subject_selected in tree.selection():
+            selected = tree.item(subject_selected)
+        selected = tree.focus()
+        values = tree.item(selected, 'values')
+        # insert entrys
+        selected_no.delete(0, END)
+        selected_name.delete(0, END)
+        selected_code.delete(0, END)
+        selected_no.insert(0, values[0])
+        selected_name.insert(0, values[1])
+        selected_code.insert(0, values[2])
+    tree.bind('<<TreeviewSelect>>', selected)
+    style.map('Treeview', background=[('selected', 'white')])
+
+    #to browse
+    # entry box
+    entercoursebrowse = Entry(browsecourse_frame, width=40)
+    entercoursebrowse.grid(row=0, column=0, columnspan=2, padx=80, pady=5, sticky='e')
+
+    # function
+    def searchcourse():
+        #show subjects
+        # create treeview frame
+        searchtree_frame = Frame(browsecourse_frame)
+        searchtree_frame.grid(row=4, column=0)
+          
+        global tree
+        # make treeview
+        searchtree = ttk.Treeview(searchtree_frame)
+
+        # create treeview scrollbar
+        searchtree_scroll = Scrollbar(searchtree_frame, orient ="vertical", command = searchtree.yview)
+        searchtree_scroll.grid(row=4, column=4, sticky='ns')
+
+        # scrollbar configure
+        searchtree_scroll.configure(command=searchtree.yview)
+
+        # treeview configure
+        searchtree.configure(yscrollcommand=searchtree_scroll.set)
+
+        # print treeview
+        searchtree.grid(row=4, column=0, columnspan=4, padx=5, pady=0, sticky="w")
+
+        # define columns
+        searchtree['columns'] = ('no', 'name', 'code', 'credithour')
+
+        # formate columns
+        searchtree.column('no', anchor=CENTER, width=50, minwidth=50, stretch=0)
+        searchtree.column('name', anchor=W, width=300, minwidth=300, stretch=0)
+        searchtree.column('code', anchor=CENTER, width=100, minwidth=100, stretch=0)
+        searchtree.column('credithour', anchor=CENTER, width=150, minwidth=150, stretch=0)
+
+        # define headings
+        searchtree.heading('no', text='No.', anchor=CENTER)
+        searchtree.heading('name', text='Subject Name', anchor=CENTER)
+        searchtree.heading('code', text='Subject Code', anchor=CENTER)
+        searchtree.heading('credithour', text='Subject Credit Hour', anchor=CENTER)
+
+        # get data
+        conn = sqlite3.connect('subject.db')
+        c = conn.cursor()
+        c.execute("SELECT *,oid FROM subject")
+        datas = c.fetchall()
+        a = 0
+        for data in datas:
+            if entercoursebrowse.get() in data[0] or entercoursebrowse.get() in data[1] or entercoursebrowse.get() == str(data[2]):
+                searchtree.insert('', index='end', values=[data[27], data[0], data[1], data[2]], iid=a)
+                a+=1
+        conn.commit()
+        conn.close()
+
+        # selected_subject
+        def selected(event):
+            for subject_selected in searchtree.selection():
+                selected = searchtree.item(subject_selected)
+            selected = searchtree.focus()
+            values = searchtree.item(selected, 'values')
+            # insert entrys
+            selected_no.delete(0, END)
+            selected_name.delete(0, END)
+            selected_code.delete(0, END)
+            selected_no.insert(0, values[0])
+            selected_name.insert(0, values[1])
+            selected_code.insert(0, values[2])
+        searchtree.bind('<<TreeviewSelect>>', selected)
+        style.map('Treeview', background=[('selected', 'white')])
+
+    # search button
+    searchcourse_btn = Button(browsecourse_frame, text='Search', command=searchcourse)
+    searchcourse_btn.grid(row=0, column=1, padx=15, pady=5, ipadx=5, sticky='w')
